@@ -60,9 +60,25 @@ W głównym katalogu projektu znajdują się następujące kluczowe pliki:
   3. **Luka Optymalności (Optimality Gap = 5%):** Dodano parametr do solvera `gapRel=0.05`, który wymusza przerwanie poszukiwań i zwrot wyniku w momencie, w którym bieżące rozwiązanie jest udowodnione jako nie gorsze niż 5% od matematycznego absolutu. Skraca to czas działania na trudnych instancjach z godzin do zaledwie minut lub sekund.
 
 * **`cvrp_ilp_warm.py`**
-  Wersja eksperymentalna rozbudowana o **Heurystyczny "Ciepły Start" (Warm Start)**. Algorytm wewnątrz skryptu przed odpaleniem solvera uruchamia prostą heurystykę konstrukcyjną typu *Nearest Neighbor* (Najbliższy Sąsiad). Heurystyka ta "zachłannie" buduje wstępne, w pełni legalne trasy. Trasy te są następnie wstrzykiwane w formie predefiniowanych zmiennych $x_{ij}$ bezpośrednio do solvera CBC. Solver odbiera te jedynki jako silne rozwiązanie początkowe, co pozwala mu pominąć setki tysięcy pierwszych węzłów i natychmiast rozpocząć odcinanie słabych kombinacji.
+  Wersja eksperymentalna rozbudowana o **Heurystyczny "Ciepły Start" (Warm Start)**. Algorytm wewnątrz skryptu przed odpaleniem solvera uruchamia heurystykę konstrukcyjną w celu wyznaczenia wstępnej, legalnej trasy. Trasy te są następnie wstrzykiwane w formie predefiniowanych zmiennych $x_{ij}$ bezpośrednio do solvera CBC. Umożliwia to zminimalizowanie czasu wczesnych faz przeszukiwania (czas potrzebny na wyznaczenie heurystycznej trasy i jej konwersję wlicza się całkowicie w proces wstępny przed odliczeniem twardego `time_limit`).
+
+* **`cvrp_genetic.py`**
+  Zaawansowana, naturalna implementacja **Algorytmu Genetycznego (GA)** do rozwiązywania problemu CVRP bez narzucania niszczących kar (Death Penalty) za przekroczenie limitu pojazdów. Algorytm posiada mechanizm *Elity Dopuszczalnej* – hodowla i krzyżowanie w pętli pokoleń odbywają się całkowicie w oparciu o czysty fizyczny koszt trasy (aby nie utracić różnorodności biologicznej), podczas gdy prezentowany na zewnątrz wynik oraz interaktywne wykresy z biegu wyodrębniają stale śledzonego, najsilniejszego dotąd znalezionego i w 100% legalnego osobnika.
+
+* **`cvrp_hybrid.py`**
+  Standardowy model Hybrydowy (Mat-heurystyka). W kroku pierwszym odpala Algorytm Genetyczny (`cvrp_genetic.py`) celem znalezienia świetnego i legalnego punktu startowego. W kroku drugim odpala klasyczny model solvera ILP na pełnym grafie miast, stosując wynikową trasę z GA jako Warm Start, minimalizując tym błądzenia po ułamkowych przestrzeniach matematycznych.
+
+* **`cvrp_hybrid_candidate.py`**
+  Najbardziej zoptymalizowana wersja Hybrydy w projekcie, wykorzystująca architekturę **Candidate Graph** (Zredukowanego Grafu Kandydatów). Zamiast uruchamiać skomplikowany model ILP dla tysięcy połączeń (co w CBC skutkuje uderzeniem w limity czasowe), drastycznie zmniejsza liczbę zmiennych w modelu matematycznym, zezwalając solverowi wyłącznie na wybór krawędzi spośród:
+  1. Złotych krawędzi wyewoluowanych przez Top 10% populacji końcowej Algorytmu Genetycznego (zarówno dopuszczalnej, jak i niedopuszczalnej).
+  2. Krawędzi łączących klientów z ich 5-cioma najbliższymi sąsiadami (k-NN) w celu zabezpieczenia grafu przed utratą perspektywy globalnego optimum.
+  
+  Dzięki temu hybrydowemu filtrowaniu i nałożonym cięciom, czas pracy solvera maleje drastycznie, umożliwiając mu udowodnienie lokalnych lub globalnych minimów w ułamkach sekund.
 
 ### Pliki pomocnicze
+
+* **`plot_utils.py`**
+  Moduł wizualizujący – poza rysowaniem map z układami tras, posiada na pokładzie parser logów wyciągający dynamiczny postęp spadania funkcji celu z historii solvera CBC (`cbc_solver.log`) oraz Algorytmu Genetycznego (`ga_solver.csv`). Dodatkowo wrysowuje referencyjną linię z docelowym `optimum_cost` na tło wykresów zbiegania się, demaskując utknięcia w minimach lokalnych.
 
 * **`utils.py`**
   Skrypt techniczny, do którego wydzielono powtarzalne mechanizmy w celu zachowania czystości głównych algorytmów:
