@@ -62,6 +62,8 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
 
     best_cost =float ('inf')
     best_routes =[]
+    best_feasible_cost = float('inf')
+    best_feasible_routes = []
 
     start_time =time .time ()
     hit_time_limit =False 
@@ -84,6 +86,10 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
             if cost <best_cost :
                 best_cost =cost 
                 best_routes =r 
+                
+            if len(r) <= K_limit and cost < best_feasible_cost:
+                best_feasible_cost = cost
+                best_feasible_routes = r
 
 
         scored_population .sort (key =lambda x :x [0 ])
@@ -123,17 +129,21 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
         population =new_population 
         
         current_time = time.time() - start_time
-        progress_history.append((current_time, best_cost))
+        display_cost = best_feasible_cost if best_feasible_cost != float('inf') else best_cost
+        progress_history.append((current_time, display_cost))
 
     end_time =time .time ()
     duration =end_time -start_time 
 
     print(f"Czas wykonania: {duration:.2f} s")
-    print(f"Minimal tour: {best_cost}")
+    
+    final_cost = best_feasible_cost if best_feasible_cost != float('inf') else best_cost
+    final_routes_raw = best_feasible_routes if best_feasible_routes else best_routes
 
+    print(f"Minimal tour (Feasible): {final_cost}")
 
     formatted_routes =[]
-    for r in best_routes :
+    for r in final_routes_raw :
         formatted_routes .append ([depot ]+r +[depot ])
         
     print(f"Routes: {formatted_routes}")
@@ -148,11 +158,11 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
 
     status ='Feasible'if not hit_time_limit else 'Time Limit'
     if save_csv :
-        save_results_to_csv (filepath ,'GA_CVRP',len (N ),len (best_routes ),Q ,duration ,time_limit ,hit_time_limit ,status ,best_cost ,formatted_routes )
+        save_results_to_csv (filepath ,'GA_CVRP',len (N ),len (final_routes_raw ),Q ,duration ,time_limit ,hit_time_limit ,status ,final_cost ,formatted_routes )
         
     if show_plot:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {best_cost}", demands=demands)
+        plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {final_cost}", demands=demands)
     if return_population:
-        return best_cost, formatted_routes, scored_population
-    return best_cost ,formatted_routes
+        return final_cost, formatted_routes, scored_population
+    return final_cost ,formatted_routes
