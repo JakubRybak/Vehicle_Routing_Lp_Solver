@@ -88,7 +88,3 @@ def solve_cvrp_ilp(filepath, time_limit=None):
         print(f"Routes: {routes}")
         
     save_results_to_csv(filepath, 'ILP_CBC', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
-
-if __name__ == '__main__':
-    filepath = sys.argv[1] if len(sys.argv) > 1 else r'data\A\A-n32-k5.vrp'
-    solve_cvrp_ilp(filepath)
