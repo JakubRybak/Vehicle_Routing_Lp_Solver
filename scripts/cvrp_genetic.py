@@ -5,7 +5,7 @@ import sys
 import os 
 from scripts .utils import parse_vrp ,save_results_to_csv 
 
-def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_rate =0.2 ,tournament_size =3 ,time_limit =60 ,seed =None ,save_csv =True ,show_plot =True ):
+def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_rate =0.2 ,tournament_size =3 ,time_limit =60 ,seed =None ,save_csv =True ,show_plot =True ,return_population =False ):
     nodes ,explicit_matrix ,ew_type ,demands ,Q ,K_limit ,depot =parse_vrp (filepath )
     V =list (demands .keys ())
     N =[i for i in V if i !=depot ]
@@ -153,5 +153,6 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
     if show_plot:
         from scripts.plot_utils import plot_route_map
         plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {best_cost}", demands=demands)
-
-    return best_cost ,formatted_routes 
+    if return_population:
+        return best_cost, formatted_routes, scored_population
+    return best_cost ,formatted_routes
