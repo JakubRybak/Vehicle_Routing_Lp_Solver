@@ -86,7 +86,7 @@ def solve_cvrp_ilp(filepath, time_limit=None):
             if i != j:
                 prob += u[j] - u[i] >= demands[j] - Q * (1 - x[i, j]) + (Q - demands[i] - demands[j]) * x[j, i]
                 
-    print("Generowanie heurystyki dla 'Ciepłego Startu'...")
+    print("Generowanie heurystyki dla 'Warm Start'")
     nn_routes = nearest_neighbor_cvrp(N, depot, demands, Q, dist, K)
     
     for i in V:
@@ -101,7 +101,7 @@ def solve_cvrp_ilp(filepath, time_limit=None):
             curr = node
         x[curr, depot].setInitialValue(1)
 
-    print("Uruchamianie zoptymalizowanego solvera CBC (Warm Start + 5% Luka)...")
+    print("Uruchamianie solvera")
     start_time = time.time()
     
     if time_limit is not None:

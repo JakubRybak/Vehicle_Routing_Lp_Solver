@@ -46,7 +46,7 @@ def solve_cvrp_ilp(filepath, time_limit=None):
             if i != j:
                 prob += u[j] - u[i] >= demands[j] - Q * (1 - x[i, j])
                 
-    print("Uruchamianie solvera CBC...")
+    print("Uruchamianie solvera")
     start_time = time.time()
     if time_limit is not None:
         prob.solve(pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit))

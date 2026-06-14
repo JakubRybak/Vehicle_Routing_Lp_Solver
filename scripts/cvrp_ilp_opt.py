@@ -50,7 +50,7 @@ def solve_cvrp_ilp(filepath, time_limit=None):
             if i != j:
                 prob += u[j] - u[i] >= demands[j] - Q * (1 - x[i, j]) + (Q - demands[i] - demands[j]) * x[j, i]
                 
-    print("Uruchamianie zoptymalizowanego solvera CBC (z ustawioną luką optymalności na 5%)...")
+    print("Uruchamianie solvera")
     start_time = time.time()
     
     if time_limit is not None:
