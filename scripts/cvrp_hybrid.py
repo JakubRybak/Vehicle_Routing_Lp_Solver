@@ -116,8 +116,4 @@ def solve_cvrp_hybrid (filepath ,ga_time_limit =60 ,ilp_time_limit =600 ,populat
     
     if show_plot and cost is not None:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, routes, depot, title=f"Hybryda - Koszt: {cost}")
-
-if __name__ =='__main__':
-    filepath =sys .argv [1 ]if len (sys .argv )>1 else r'..\data\E\E-n22-k4.vrp'
-    solve_cvrp_hybrid (filepath )
+        plot_route_map(nodes, routes, depot, title=f"Hybryda - Koszt: {cost}", demands=demands)

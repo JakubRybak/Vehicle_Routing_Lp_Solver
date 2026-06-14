@@ -147,4 +147,4 @@ def solve_cvrp_ilp (filepath ,time_limit =None ,show_plot =True ):
     
     if show_plot and cost is not None:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, routes, depot, title=f"ILP Warm Start - Koszt: {cost}")
+        plot_route_map(nodes, routes, depot, title=f"ILP Warm Start - Koszt: {cost}", demands=demands)

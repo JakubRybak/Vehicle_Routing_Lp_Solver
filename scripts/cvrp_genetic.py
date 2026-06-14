@@ -152,11 +152,6 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
         
     if show_plot:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {best_cost}")
+        plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {best_cost}", demands=demands)
 
     return best_cost ,formatted_routes 
-
-if __name__ =='__main__':
-
-    filepath =sys .argv [1 ]if len (sys .argv )>1 else r'..\data\E\E-n22-k4.vrp'
-    solve_cvrp_ga (filepath ,save_csv =True )
