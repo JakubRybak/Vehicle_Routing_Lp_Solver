@@ -3,43 +3,7 @@ import pulp
 import sys
 import time
 import os
-from utils import parse_vrp, save_results_to_csv
-
-def nearest_neighbor_cvrp(N, depot, demands, Q, dist_func, K):
-    unvisited = set(N)
-    routes = []
-    
-    while unvisited and len(routes) < K:
-        route = []
-        curr_load = 0
-        curr_node = depot
-        
-        while unvisited:
-            best_node = None
-            best_dist = float('inf')
-            for j in unvisited:
-                if curr_load + demands[j] <= Q:
-                    d = dist_func(curr_node, j)
-                    if d < best_dist:
-                        best_dist = d
-                        best_node = j
-            
-            if best_node is None:
-                break
-                
-            route.append(best_node)
-            curr_load += demands[best_node]
-            curr_node = best_node
-            unvisited.remove(best_node)
-            
-        if route:
-            routes.append(route)
-            
-    if unvisited and routes:
-        for node in unvisited:
-            routes[-1].append(node)
-            
-    return routes
+from scripts.utils import parse_vrp, save_results_to_csv
 
 def solve_cvrp_ilp(filepath, time_limit=None):
     nodes, explicit_matrix, ew_type, demands, Q, K, depot = parse_vrp(filepath)
@@ -58,7 +22,7 @@ def solve_cvrp_ilp(filepath, time_limit=None):
         
     print(f"Wczytano {len(N)} klientów, depot: {depot}, pojemność: {Q}, maks. ciężarówek: {K}")
         
-    prob = pulp.LpProblem("CVRP_ILP_WARM", pulp.LpMinimize)
+    prob = pulp.LpProblem("CVRP_ILP_OPT", pulp.LpMinimize)
     
     x = pulp.LpVariable.dicts("x", ((i, j) for i in V for j in V if i != j), cat='Binary')
     u = pulp.LpVariable.dicts("u", N, lowBound=0, upBound=Q, cat='Continuous')
@@ -86,28 +50,13 @@ def solve_cvrp_ilp(filepath, time_limit=None):
             if i != j:
                 prob += u[j] - u[i] >= demands[j] - Q * (1 - x[i, j]) + (Q - demands[i] - demands[j]) * x[j, i]
                 
-    print("Generowanie heurystyki dla 'Ciepłego Startu'...")
-    nn_routes = nearest_neighbor_cvrp(N, depot, demands, Q, dist, K)
-    
-    for i in V:
-        for j in V:
-            if i != j:
-                x[i, j].setInitialValue(0)
-                
-    for route in nn_routes:
-        curr = depot
-        for node in route:
-            x[curr, node].setInitialValue(1)
-            curr = node
-        x[curr, depot].setInitialValue(1)
-
-    print("Uruchamianie zoptymalizowanego solvera CBC (Warm Start + 5% Luka)...")
+    print("Uruchamianie zoptymalizowanego solvera CBC (z ustawioną luką optymalności na 5%)...")
     start_time = time.time()
     
     if time_limit is not None:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit, gapRel=0.05, warmStart=True, keepFiles=True))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit, gapRel=0.05))
     else:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False, gapRel=0.05, warmStart=True, keepFiles=True))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, gapRel=0.05))
         
     end_time = time.time()
     duration = end_time - start_time
@@ -144,4 +93,4 @@ def solve_cvrp_ilp(filepath, time_limit=None):
                 routes.append(route)
         print(f"Routes: {routes}")
         
-    save_results_to_csv(filepath, 'ILP_CBC_WARM', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
+    save_results_to_csv(filepath, 'ILP_CBC_OPT', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)

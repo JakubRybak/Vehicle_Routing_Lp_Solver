@@ -3,7 +3,7 @@ import pulp
 import sys
 import time
 import os
-from utils import parse_vrp, save_results_to_csv
+from scripts.utils import parse_vrp, save_results_to_csv
 
 def solve_cvrp_ilp(filepath, time_limit=None):
     nodes, explicit_matrix, ew_type, demands, Q, K, depot = parse_vrp(filepath)
