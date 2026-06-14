@@ -14,6 +14,7 @@ venv.bak/
 
 # PuLP and Solver artifacts
 *.mps
+*.mst
 *.sol
 *.lp
 
