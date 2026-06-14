@@ -5,7 +5,7 @@ import time
 import os
 from scripts.utils import parse_vrp, save_results_to_csv
 
-def solve_cvrp_ilp(filepath, time_limit=None):
+def solve_cvrp_ilp(filepath, time_limit=None, show_plot=True):
     nodes, explicit_matrix, ew_type, demands, Q, K, depot = parse_vrp(filepath)
     V = list(demands.keys())
     N = [i for i in V if i != depot] 
@@ -49,9 +49,9 @@ def solve_cvrp_ilp(filepath, time_limit=None):
     print("Uruchamianie solvera")
     start_time = time.time()
     if time_limit is not None:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False, timeLimit=time_limit))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath="cbc_solver.log", timeLimit=time_limit))
     else:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath="cbc_solver.log"))
     end_time = time.time()
     duration = end_time - start_time
     
@@ -87,4 +87,8 @@ def solve_cvrp_ilp(filepath, time_limit=None):
                 routes.append(route)
         print(f"Routes: {routes}")
         
-    save_results_to_csv(filepath, 'ILP_CBC', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
+    save_results_to_csv(filepath, 'ILP_CBC_BASIC', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
+    
+    if show_plot and cost is not None:
+        from scripts.plot_utils import plot_route_map
+        plot_route_map(nodes, routes, depot, title=f"ILP Basic - Koszt: {cost}")

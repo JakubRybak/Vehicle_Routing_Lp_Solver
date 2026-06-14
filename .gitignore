@@ -18,6 +18,9 @@ venv.bak/
 *.sol
 *.lp
 
+cbc_solver.log
+ga_solver.csv
+
 # OS generated files
 .DS_Store
 .DS_Store?
