@@ -72,9 +72,9 @@ def solve_cvrp_hybrid (filepath ,ga_time_limit =60 ,ilp_time_limit =600 ,populat
     start_time =time .time ()
 
     if ilp_time_limit is not None :
-        prob .solve (pulp .PULP_CBC_CMD (msg =False ,logPath ="cbc_solver.log" ,timeLimit =ilp_time_limit ,gapRel =0.05 ,warmStart =True ,keepFiles =True ))
+        prob .solve (pulp .PULP_CBC_CMD (msg =False ,logPath =f"cbc_solver_{os.getpid()}.log" ,timeLimit =ilp_time_limit ,gapRel =0.05 ,warmStart =True ,keepFiles =True ))
     else :
-        prob .solve (pulp .PULP_CBC_CMD (msg =False ,logPath ="cbc_solver.log" ,gapRel =0.05 ,warmStart =True ,keepFiles =True ))
+        prob .solve (pulp .PULP_CBC_CMD (msg =False ,logPath =f"cbc_solver_{os.getpid()}.log" ,gapRel =0.05 ,warmStart =True ,keepFiles =True ))
 
     end_time =time .time ()
     duration =end_time -start_time 
@@ -116,4 +116,4 @@ def solve_cvrp_hybrid (filepath ,ga_time_limit =60 ,ilp_time_limit =600 ,populat
     
     if show_plot and cost is not None:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, routes, depot, title=f"Hybryda - Koszt: {cost}", demands=demands)
+        plot_route_map(nodes, routes, depot, title=f"Trasa - Koszt: {cost}", demands=demands)

@@ -20,6 +20,7 @@ venv.bak/
 
 cbc_solver.log
 ga_solver.csv
+*.log
 
 # OS generated files
 .DS_Store
@@ -29,3 +30,5 @@ ga_solver.csv
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+ga*.csv

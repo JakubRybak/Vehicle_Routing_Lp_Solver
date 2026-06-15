@@ -2,7 +2,8 @@ import re
 import matplotlib .pyplot as plt 
 import os 
 
-def plot_cbc_log (log_filepath="cbc_solver.log", optimum_cost=None):
+def plot_cbc_log (log_filepath=None, optimum_cost=None):
+    if log_filepath is None: log_filepath = f"cbc_solver_{os.getpid()}.log"
     times =[]
     upper_bounds =[]
     lower_bounds =[]
@@ -40,7 +41,7 @@ def plot_cbc_log (log_filepath="cbc_solver.log", optimum_cost=None):
     if optimum_cost is not None:
         plt.axhline(y=optimum_cost, color='black', linestyle='--', linewidth=2, label='Globalne Optimum')
 
-    plt.title('Postęp Solvera CBC - Zbieganie się Optimum')
+    plt.title('Funkcja Celu w Czasie')
     plt.xlabel('Czas (sekundy)')
     plt.ylabel('Dystans')
     plt.legend()
@@ -94,7 +95,8 @@ def plot_route_map(nodes, routes, depot, title="Trasy CVRP", demands=None):
     plt.tight_layout()
     plt.show()
 
-def plot_ga_log(log_filepath="ga_solver.csv", optimum_cost=None):
+def plot_ga_log(log_filepath=None, optimum_cost=None):
+    if log_filepath is None: log_filepath = f"ga_solver_{os.getpid()}.csv"
     if not os.path.exists(log_filepath):
         return
         
@@ -121,7 +123,7 @@ def plot_ga_log(log_filepath="ga_solver.csv", optimum_cost=None):
     if optimum_cost is not None:
         plt.axhline(y=optimum_cost, color='black', linestyle='--', linewidth=2, label='Globalne Optimum')
         
-    plt.title('Postęp Algorytmu Genetycznego')
+    plt.title('Funkcja Celu w Czasie')
     plt.xlabel('Czas (sekundy)')
     plt.ylabel('Dystans')
     plt.legend()
@@ -129,7 +131,9 @@ def plot_ga_log(log_filepath="ga_solver.csv", optimum_cost=None):
     plt.tight_layout()
     plt.show()
 
-def plot_hybrid_log(ga_filepath="ga_solver.csv", cbc_filepath="cbc_solver.log", optimum_cost=None):
+def plot_hybrid_log(ga_filepath=None, cbc_filepath=None, optimum_cost=None):
+    if ga_filepath is None: ga_filepath = f"ga_solver_{os.getpid()}.csv"
+    if cbc_filepath is None: cbc_filepath = f"cbc_solver_{os.getpid()}.log"
     if not os.path.exists(ga_filepath) or not os.path.exists(cbc_filepath):
         return
         
@@ -182,7 +186,7 @@ def plot_hybrid_log(ga_filepath="ga_solver.csv", cbc_filepath="cbc_solver.log", 
     if optimum_cost is not None:
         plt.axhline(y=optimum_cost, color='black', linestyle='--', linewidth=2, label='Globalne Optimum')
         
-    plt.title('Postęp Hybrydowy (Genetyk + ILP) w czasie')
+    plt.title('Funkcja Celu w Czasie')
     plt.xlabel('Całkowity Czas (sekundy)')
     plt.ylabel('Dystans')
     

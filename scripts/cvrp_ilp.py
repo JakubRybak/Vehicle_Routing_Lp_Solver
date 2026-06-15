@@ -49,9 +49,9 @@ def solve_cvrp_ilp(filepath, time_limit=None, show_plot=True):
     print("Uruchamianie solvera")
     start_time = time.time()
     if time_limit is not None:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath="cbc_solver.log", timeLimit=time_limit))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath=f"cbc_solver_{os.getpid()}.log", timeLimit=time_limit))
     else:
-        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath="cbc_solver.log"))
+        prob.solve(pulp.PULP_CBC_CMD(msg=False, logPath=f"cbc_solver_{os.getpid()}.log"))
     end_time = time.time()
     duration = end_time - start_time
     
@@ -91,4 +91,4 @@ def solve_cvrp_ilp(filepath, time_limit=None, show_plot=True):
     
     if show_plot and cost is not None:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, routes, depot, title=f"ILP Basic - Koszt: {cost}", demands=demands)
+        plot_route_map(nodes, routes, depot, title=f"Trasa - Koszt: {cost}", demands=demands)

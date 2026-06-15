@@ -149,7 +149,7 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
     print(f"Routes: {formatted_routes}")
         
     try:
-        with open("ga_solver.csv", "w", encoding='utf-8') as f:
+        with open(f"ga_solver_{os.getpid()}.csv", "w", encoding='utf-8') as f:
             f.write("Time,BestCost\n")
             for t, c in progress_history:
                 f.write(f"{t},{c}\n")
@@ -162,7 +162,7 @@ def solve_cvrp_ga (filepath ,generations =500 ,population_size =100 ,mutation_ra
         
     if show_plot:
         from scripts.plot_utils import plot_route_map
-        plot_route_map(nodes, formatted_routes, depot, title=f"Genetyk - Koszt: {final_cost}", demands=demands)
+        plot_route_map(nodes, formatted_routes, depot, title=f"Trasa - Koszt: {final_cost}", demands=demands)
     if return_population:
         return final_cost, formatted_routes, scored_population
     return final_cost ,formatted_routes
