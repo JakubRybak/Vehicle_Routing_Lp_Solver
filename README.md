@@ -1,6 +1,6 @@
 # Capacitated Vehicle Routing Problem - Solvery ILP
 
-Ten projekt zawiera implementację oraz optymalizację algorytmów rozwiązujących problem wyznaczania tras pojazdów z ograniczeniem pojemności przy użyciu programowania całkowitoliczbowego w bibliotece PuLP z darmowym solverem CBC.
+Ten projekt zawiera implementację oraz optymalizację algorytmów rozwiązujących problem wyznaczania tras pojazdów z ograniczeniem pojemności przy użyciu programowania całkowitoliczbowego w bibliotece PuLP.
 
 ## Struktura plików
 
@@ -51,44 +51,26 @@ W głównym katalogu projektu znajdują się następujące kluczowe pliki:
      \sum_{j \in N} x_{0j} \ge \left\lceil \frac{\sum_{i \in N} q_i}{Q} \right\rceil
      $$
      
-  2. **Zacieśnione granice pojemności:** Klasyczne ograniczenie wymuszające ciągłość trasy zostało rozszerzone o bardzo restrykcyjny składnik uwzględniający przepływ w przeciwnym kierunku. Skutkuje to dużo szybszym odrzucaniem matematycznie niemożliwych układów węzłów podczas fazy pre-solve.
+  2. **Zacieśnione granice pojemności:** Klasyczne ograniczenie wymuszające ciągłość trasy zostało rozszerzone o bardzo restrykcyjny składnik uwzględniający przepływ w przeciwnym kierunku. Skutkuje to dużo szybszym odrzucaniem matematycznie niemożliwych układów węzłów.
   
      $$
      u_j - u_i \ge q_j - Q(1 - x_{ij}) + (Q - q_i - q_j)x_{ji}
      $$
      
-  3. **Luka Optymalności 5 procent:** Dodano parametr do solvera gapRel=0.05, który wymusza przerwanie poszukiwań i zwrot wyniku w momencie, w którym bieżące rozwiązanie jest udowodnione jako nie gorsze niż 5 procent od matematycznego absolutu. Skraca to czas działania na trudnych instancjach z godzin do zaledwie minut lub sekund.
+  3. **Luka Optymalności 5 procent:** Dodano parametr do solvera gapRel=0.05, który wymusza przerwanie poszukiwań i zwrot wyniku w momencie, w którym bieżące rozwiązanie jest udowodnione jako nie gorsze niż 5 procent od matematycznego absolutu. Skraca to czas działania na trudnych instancjach.
 
 * **`cvrp_ilp_warm.py`**
-  Wersja eksperymentalna rozbudowana o Heurystyczny Ciepły Start. Algorytm wewnątrz skryptu przed odpaleniem solvera uruchamia heurystykę konstrukcyjną w celu wyznaczenia wstępnej, legalnej trasy. Trasy te są następnie wstrzykiwane w formie predefiniowanych zmiennych $x_{ij}$ bezpośrednio do solvera CBC. Umożliwia to zminimalizowanie czasu wczesnych faz przeszukiwania a czas potrzebny na wyznaczenie heurystycznej trasy i jej konwersję wlicza się całkowicie w proces wstępny przed odliczeniem twardego time_limit.
+  Wersja eksperymentalna rozbudowana o Heurystyczny Warm Start algorytmu Nearest Neighbor. Algorytm wewnątrz skryptu przed odpaleniem solvera uruchamia heurystykę konstrukcyjną w celu wyznaczenia wstępnej, legalnej trasy. Trasy te są następnie wstrzykiwane w formie predefiniowanych zmiennych $x_{ij}$ bezpośrednio do solvera CBC. Umożliwia to zminimalizowanie czasu wczesnych faz przeszukiwania a czas potrzebny na wyznaczenie heurystycznej trasy i jej konwersję wlicza się całkowicie w proces wstępny przed odliczeniem twardego time_limit.
 
 * **`cvrp_genetic.py`**
-  Zaawansowana, naturalna implementacja Algorytmu Genetycznego do rozwiązywania problemu CVRP bez narzucania niszczących kar za przekroczenie limitu pojazdów. Algorytm posiada mechanizm Elity Dopuszczalnej – hodowla i krzyżowanie w pętli pokoleń odbywają się całkowicie w oparciu o czysty fizyczny koszt trasy w celu zachowania różnorodności biologicznej. Tymczasem prezentowany na zewnątrz wynik oraz interaktywne wykresy z biegu wyodrębniają stale śledzonego, najsilniejszego dotąd znalezionego i w pełni legalnego osobnika.
+  Implementacja Algorytmu Genetycznego do rozwiązywania problemu CVRP. Algorytm na drodze ewolucji krzyżuje i mutuje trasy w oparciu o ich całkowity koszt dystansu. Posiada wbudowany mechanizm Elity Dopuszczalnej, który stale śledzi populację i wyodrębnia z niej na zewnątrz najlepsze rozwiązanie mieszczące się w rygorystycznym limicie ciężarówek.
 
 * **`cvrp_hybrid.py`**
-  Standardowy model Hybrydowy oparty o mat-heurystykę. W kroku pierwszym odpala Algorytm Genetyczny celem znalezienia świetnego i legalnego punktu startowego. W kroku drugim odpala klasyczny model solvera ILP na pełnym grafie miast, stosując wynikową trasę jako Ciepły Start, minimalizując tym błądzenia po ułamkowych przestrzeniach matematycznych.
+  Model Hybrydowy. W kroku pierwszym odpala Algorytm Genetyczny celem znalezienia świetnego i legalnego punktu startowego. W kroku drugim odpala klasyczny model solvera ILP na pełnym grafie miast, stosując wynikową trasę jako Warm Start, minimalizując tym błądzenia po ułamkowych przestrzeniach matematycznych.
 
 * **`cvrp_hybrid_candidate.py`**
-  Najbardziej zoptymalizowana wersja Hybrydy w projekcie, wykorzystująca architekturę Zredukowanego Grafu Kandydatów. Zamiast uruchamiać skomplikowany model ILP dla tysięcy połączeń drastycznie zmniejsza liczbę zmiennych w modelu matematycznym, zezwalając solverowi wyłącznie na wybór krawędzi spośród:
-  1. Złotych krawędzi wyewoluowanych przez Top 10 procent populacji końcowej Algorytmu Genetycznego.
+  Inna wersja Hybrydy w projekcie, wykorzystująca architekturę Zredukowanego Grafu Kandydatów. Zamiast uruchamiać skomplikowany model ILP dla tysięcy połączeń drastycznie zmniejsza liczbę zmiennych w modelu matematycznym, zezwalając solverowi wyłącznie na wybór krawędzi spośród:
+  1. Krawędzi wyewoluowanych przez Top 10 procent populacji końcowej Algorytmu Genetycznego.
   2. Krawędzi łączących klientów z ich pięcioma najbliższymi sąsiadami w celu zabezpieczenia grafu przed utratą perspektywy globalnego optimum.
   
-  Dzięki temu hybrydowemu filtrowaniu i nałożonym cięciom, czas pracy solvera maleje drastycznie, umożliwiając mu udowodnienie lokalnych lub globalnych minimów w ułamkach sekund.
-
-### Pliki pomocnicze
-
-* **`plot_utils.py`**
-  Moduł wizualizujący – poza rysowaniem map z układami tras, posiada na pokładzie parser logów wyciągający dynamiczny postęp spadania funkcji celu z historii solvera CBC oraz Algorytmu Genetycznego. Dodatkowo wrysowuje referencyjną linię z docelowym optimum_cost na tło wykresów zbiegania się, demaskując utknięcia w minimach lokalnych.
-
-* **`utils.py`**
-  Skrypt techniczny, do którego wydzielono powtarzalne mechanizmy w celu zachowania czystości głównych algorytmów:
-  * `parse_vrp` - odpowiada za parsowanie wczytywanych plików z końcówką vrp oraz ekstrakcję koordynatów, dystansów i macierzy popytu.
-  * `save_results_to_csv` - ustandaryzowana "drukarka", dodająca do pliku analitycznego parametry uruchomienia solvera, czas wykonania i wyliczone trasy.
-
-### Katalogi ze zbiorami i raportami
-
-* **`data/`**
-  Katalog przechowujący instancje problemów CVRP ze zróżnicowaną liczbą węzłów podzielone na grupy A i E.
-
-* **`results/`**
-  Katalog docelowy gromadzący raporty z naszych eksperymentów. Znajduje się tam plik `experiments.csv` – zestawienie, pokazujące zachowanie poszczególnych wariantów modelu na testowanych zbiorach danych wraz ze zmierzonymi czasami działania i kosztami.
+  Dzięki temu hybrydowemu filtrowaniu i nałożonym cięciom, czas pracy solvera maleje, umożliwiając mu udowodnienie lokalnych lub globalnych minimów.
