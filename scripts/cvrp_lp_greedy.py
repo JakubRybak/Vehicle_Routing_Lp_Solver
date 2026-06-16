@@ -132,9 +132,17 @@ def solve_cvrp_lp(filepath, time_limit=None, show_plot=True):
         for r_id in active_routes:
             routes.append([depot] + route_nodes[r_id] + [depot])
 
-
-    save_results_to_csv(filepath, 'LP_CBC_GREEDY', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
+        heuristic_cost = 0
+        for route in routes:
+            for idx in range(len(route) - 1):
+                heuristic_cost += dist(route[idx], route[idx+1])
+                
+        print(f"Rzeczywisty koszt sklejonej trasy: {heuristic_cost}")
+        cost = heuristic_cost
+    save_results_to_csv(filepath, 'LP_GREEDY', len(N), K, Q, duration, time_limit, hit_time_limit, pulp.LpStatus[prob.status], cost, routes)
     
     if show_plot and cost is not None:
         from scripts.plot_utils import plot_route_map
         plot_route_map(nodes, routes, depot, title=f"LP GREEDY - Koszt: {cost}", demands=demands)
+        
+    return routes, cost
