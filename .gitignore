@@ -32,3 +32,5 @@ ehthumbs.db
 Thumbs.db
 
 ga*.csv
+.agents
+graphify-out
