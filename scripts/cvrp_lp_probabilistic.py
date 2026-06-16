@@ -135,3 +135,5 @@ def solve_cvrp_lp_probabilistic(filepath, num_iterations=100, time_limit=None, s
     if show_plot and best_heuristic_cost != float('inf'):
         from scripts.plot_utils import plot_route_map
         plot_route_map(nodes, best_final_routes, depot, title=f"LP PROBABILISTIC - Koszt: {best_heuristic_cost}", demands=demands)
+
+    return best_final_routes, best_heuristic_cost
