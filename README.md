@@ -9,8 +9,7 @@ W głównym katalogu projektu znajdują się następujące kluczowe pliki:
 ### Pliki główne i Algorytmy
 
 * **`cvrp_ilp.py`**
-  Podstawowa, klasyczna implementacja modelu matematycznego ILP. Używa sformułowania przepływowego oraz standardowych ograniczeń do eliminacji podtras i wymuszania pojemności. Jest to wariant bazowy, w którym kompilator matematyczny poszukuje optymalnego rozwiązania bez żadnych dodatkowych podpowiedzi ze strony programisty.
-  
+  Podstawowa, klasyczna implementacja modelu matematycznego ILP. Używa sformułowania przepływowego oraz standardowych ograniczeń do eliminacji podtras i wymuszania pojemności.
   **Zmienne decyzyjne:**
   * $x_{ij} \in \{0, 1\}$ – zmienna binarna; przyjmuje 1, jeśli ciężarówka przemieszcza się bezpośrednio z węzła $i$ do $j$.
   * $u_i \ge 0$ – ciągła zmienna pomocnicza, pełniąca rolę skumulowanego "licznika wydanych paczek" w pojeździe po obsłużeniu klienta $i$.
